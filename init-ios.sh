@@ -41,7 +41,7 @@ TOOLS=tools
 
 FF_ALL_ARCHS_IOS6_SDK="armv7 armv7s i386"
 FF_ALL_ARCHS_IOS7_SDK="armv7 armv7s arm64 i386 x86_64"
-FF_ALL_ARCHS_IOS8_SDK="armv7 arm64 i386 x86_64"
+FF_ALL_ARCHS_IOS8_SDK="arm64"
 FF_ALL_ARCHS=$FF_ALL_ARCHS_IOS8_SDK
 FF_TARGET=$1
 
@@ -67,8 +67,7 @@ function pull_fork() {
 }
 
 function pull_fork_all() {
-    for ARCH in $FF_ALL_ARCHS
-    do
+    for ARCH in $FF_ALL_ARCHS; do
         pull_fork $ARCH
     done
 }
@@ -79,18 +78,17 @@ function sync_ff_version() {
 
 #----------
 case "$FF_TARGET" in
-    ffmpeg-version)
-        echo_ffmpeg_version
+ffmpeg-version)
+    echo_ffmpeg_version
     ;;
-    armv7|armv7s|arm64|i386|x86_64)
-        pull_common
-        pull_fork $FF_TARGET
+armv7 | armv7s | arm64 | i386 | x86_64)
+    pull_common
+    pull_fork $FF_TARGET
     ;;
-    all|*)
-        pull_common
-        pull_fork_all
+all | *)
+    pull_common
+    pull_fork_all
     ;;
 esac
 
 sync_ff_version
-

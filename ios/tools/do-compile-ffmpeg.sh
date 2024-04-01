@@ -31,7 +31,6 @@ set -e
 #--------------------
 # include
 
-
 #--------------------
 # common defines
 FF_ARCH=$1
@@ -43,10 +42,8 @@ if [ -z "$FF_ARCH" ]; then
     exit 1
 fi
 
-
-FF_BUILD_ROOT=`pwd`
+FF_BUILD_ROOT=$(pwd)
 FF_TAGET_OS="darwin"
-
 
 # ffmpeg build params
 export COMMON_FF_CFG_FLAGS=
@@ -73,7 +70,7 @@ FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --arch=$FF_ARCH"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --target-os=$FF_TAGET_OS"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --enable-static"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --disable-shared"
-FFMPEG_EXTRA_CFLAGS=
+FFMPEG_EXTRA_CFLAGS="-Wno-error=incompatible-function-pointer-types -Wno-error=int-conversion"
 
 # i386, x86_64
 FFMPEG_CFG_FLAGS_SIMULATOR=
@@ -86,15 +83,15 @@ FFMPEG_CFG_FLAGS_ARM=
 FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-pic"
 FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-neon"
 case "$FF_BUILD_OPT" in
-    debug)
-        FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --disable-optimizations"
-        FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-debug"
-        FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --disable-small"
+debug)
+    FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --disable-optimizations"
+    FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-debug"
+    FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --disable-small"
     ;;
-    *)
-        FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-optimizations"
-        FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-debug"
-        FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-small"
+*)
+    FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-optimizations"
+    FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-debug"
+    FFMPEG_CFG_FLAGS_ARM="$FFMPEG_CFG_FLAGS_ARM --enable-small"
     ;;
 esac
 
@@ -158,7 +155,7 @@ elif [ "$FF_ARCH" = "arm64" ]; then
     FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS $FFMPEG_CFG_FLAGS_ARM"
     FF_GASPP_EXPORT="GASPP_FIX_XCODE5=1"
 else
-    echo "unknown architecture $FF_ARCH";
+    echo "unknown architecture $FF_ARCH"
     exit 1
 fi
 
@@ -185,7 +182,7 @@ echo "build_prefix: $FF_BUILD_PREFIX"
 echo "\n--------------------"
 echo "[*] configurate ffmpeg"
 echo "--------------------"
-FF_XCRUN_SDK=`echo $FF_XCRUN_PLATFORM | tr '[:upper:]' '[:lower:]'`
+FF_XCRUN_SDK=$(echo $FF_XCRUN_PLATFORM | tr '[:upper:]' '[:lower:]')
 FF_XCRUN_CC="xcrun -sdk $FF_XCRUN_SDK clang"
 
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS $FFMPEG_CFG_CPU"
