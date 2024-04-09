@@ -65,7 +65,7 @@
     return ;
 }
 
-- (BOOL)setActive:(BOOL)active
+- (void)setActive:(BOOL)active
 {
     if (active != NO) {
         [[AVAudioSession sharedInstance] setActive:YES error:nil];
