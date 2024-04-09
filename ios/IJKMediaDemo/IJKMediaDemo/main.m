@@ -2,17 +2,17 @@
 //  main.m
 //  IJKMediaDemo
 //
-//  Created by ZhangRui on 13-9-19.
-//  Copyright (c) 2013年 bilibili. All rights reserved.
+//  Created by yxibng on 2024/4/10.
 //
 
 #import <UIKit/UIKit.h>
-
 #import "IJKAppDelegate.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char * argv[]) {
+    NSString * appDelegateClassName;
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([IJKAppDelegate class]));
+        // Setup code that might create autoreleased objects goes here.
+        appDelegateClassName = NSStringFromClass([IJKAppDelegate class]);
     }
+    return UIApplicationMain(argc, argv, nil, appDelegateClassName);
 }
