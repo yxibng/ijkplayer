@@ -17,9 +17,9 @@
 #
 
 # IJK_FFMPEG_UPSTREAM=git://git.videolan.org/ffmpeg.git
-IJK_FFMPEG_UPSTREAM=https://github.com/Bilibili/FFmpeg.git
-IJK_FFMPEG_FORK=https://github.com/Bilibili/FFmpeg.git
-IJK_FFMPEG_COMMIT=ff4.0--ijk0.8.8--20210426--001
+IJK_FFMPEG_UPSTREAM=https://github.com/FFmpeg/FFmpeg.git
+IJK_FFMPEG_FORK=https://github.com/FFmpeg/FFmpeg.git
+IJK_FFMPEG_COMMIT=n8.1
 IJK_FFMPEG_LOCAL_REPO=extra/ffmpeg
 
 IJK_GASP_UPSTREAM=https://github.com/Bilibili/gas-preprocessor.git
@@ -39,8 +39,8 @@ fi
 set -e
 TOOLS=tools
 
-FF_ALL_ARCHS_IOS6_SDK="armv7 armv7s i386"
-FF_ALL_ARCHS_IOS7_SDK="armv7 armv7s arm64 i386 x86_64"
+FF_ALL_ARCHS_IOS6_SDK="x86_64"
+FF_ALL_ARCHS_IOS7_SDK="arm64 x86_64"
 FF_ALL_ARCHS_IOS8_SDK="arm64"
 FF_ALL_ARCHS=$FF_ALL_ARCHS_IOS8_SDK
 FF_TARGET=$1
@@ -81,7 +81,7 @@ case "$FF_TARGET" in
 ffmpeg-version)
     echo_ffmpeg_version
     ;;
-armv7 | armv7s | arm64 | i386 | x86_64)
+arm64 | x86_64)
     pull_common
     pull_fork $FF_TARGET
     ;;

@@ -120,6 +120,27 @@ typedef struct IJKFF_Pipenode_Opaque {
     volatile bool             abort;
 } IJKFF_Pipenode_Opaque;
 
+static int ijk_avcodec_decode_video_compat(AVCodecContext *avctx, AVFrame *frame, AVPacket *pkt, int *got_picture)
+{
+    int ret = avcodec_send_packet(avctx, pkt);
+    if (ret < 0)
+        return ret;
+
+    ret = avcodec_receive_frame(avctx, frame);
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+        if (got_picture)
+            *got_picture = 0;
+        return 0;
+    }
+
+    if (ret < 0)
+        return ret;
+
+    if (got_picture)
+        *got_picture = 1;
+    return 0;
+}
+
 static SDL_AMediaCodec *create_codec_l(JNIEnv *env, IJKFF_Pipenode *node)
 {
     IJKFF_Pipenode_Opaque        *opaque   = node->opaque;
@@ -547,7 +568,7 @@ static int feed_input_buffer2(JNIEnv *env, IJKFF_Pipenode *node, int64_t timeUs,
                     return change_ret;
                 }
 
-                change_ret = avcodec_decode_video2(new_avctx, frame, &got_picture, avpkt);
+                change_ret = ijk_avcodec_decode_video_compat(new_avctx, frame, avpkt, &got_picture);
                 if (change_ret < 0) {
                     avcodec_free_context(&new_avctx);
                     return change_ret;
@@ -794,7 +815,7 @@ static int feed_input_buffer(JNIEnv *env, IJKFF_Pipenode *node, int64_t timeUs, 
                     return change_ret;
                 }
 
-                change_ret = avcodec_decode_video2(new_avctx, frame, &got_picture, avpkt);
+                change_ret = ijk_avcodec_decode_video_compat(new_avctx, frame, avpkt, &got_picture);
                 if (change_ret < 0) {
                     avcodec_free_context(&new_avctx);
                     return change_ret;
