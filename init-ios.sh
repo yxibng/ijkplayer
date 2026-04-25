@@ -18,7 +18,6 @@
 
 # IJK_FFMPEG_UPSTREAM=git://git.videolan.org/ffmpeg.git
 IJK_FFMPEG_UPSTREAM=https://github.com/FFmpeg/FFmpeg.git
-IJK_FFMPEG_FORK=https://github.com/FFmpeg/FFmpeg.git
 IJK_FFMPEG_COMMIT=n8.1
 IJK_FFMPEG_LOCAL_REPO=extra/ffmpeg
 
@@ -29,7 +28,6 @@ IJK_GASP_UPSTREAM=https://github.com/FFmpeg/gas-preprocessor.git
 
 if [ "$IJK_FFMPEG_REPO_URL" != "" ]; then
     IJK_FFMPEG_UPSTREAM=$IJK_FFMPEG_REPO_URL
-    IJK_FFMPEG_FORK=$IJK_FFMPEG_REPO_URL
 fi
 
 if [ "$IJK_GASP_REPO_URL" != "" ]; then
@@ -39,10 +37,8 @@ fi
 set -e
 TOOLS=tools
 
-FF_ALL_ARCHS_IOS6_SDK="x86_64"
-FF_ALL_ARCHS_IOS7_SDK="arm64 x86_64"
-FF_ALL_ARCHS_IOS8_SDK="arm64"
-FF_ALL_ARCHS=$FF_ALL_ARCHS_IOS8_SDK
+# Default architectures (env-overridable)
+: ${FF_ALL_ARCHS:="arm64 x86_64"}
 FF_TARGET=$1
 
 function echo_ffmpeg_version() {
@@ -59,8 +55,8 @@ function pull_common() {
 }
 
 function pull_fork() {
-    echo "== pull ffmpeg fork $1 =="
-    sh $TOOLS/pull-repo-ref.sh $IJK_FFMPEG_FORK ios/ffmpeg-$1 ${IJK_FFMPEG_LOCAL_REPO}
+    echo "== pull ffmpeg upstream $1 =="
+    sh $TOOLS/pull-repo-ref.sh $IJK_FFMPEG_UPSTREAM ios/ffmpeg-$1 ${IJK_FFMPEG_LOCAL_REPO}
     cd ios/ffmpeg-$1
     git checkout ${IJK_FFMPEG_COMMIT} -B ijkplayer
     cd -
@@ -84,6 +80,11 @@ ffmpeg-version)
 arm64 | x86_64)
     pull_common
     pull_fork $FF_TARGET
+    ;;
+simulator)
+    pull_common
+    # Only pull x86_64 simulator sources in the simplified workflow
+    pull_fork x86_64
     ;;
 all | *)
     pull_common

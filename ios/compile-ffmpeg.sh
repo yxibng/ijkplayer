@@ -19,14 +19,13 @@
 #----------
 # modify for your build tool
 
-FF_ALL_ARCHS_IOS6_SDK="x86_64"
-FF_ALL_ARCHS_IOS7_SDK="arm64 x86_64"
-FF_ALL_ARCHS_IOS8_SDK="arm64"
-
-FF_ALL_ARCHS=$FF_ALL_ARCHS_IOS8_SDK
+# Default architectures (env-overridable)
+: ${FF_ALL_ARCHS:="arm64 x86_64"}
 
 #----------
-UNI_BUILD_ROOT=$(pwd)
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+# Use the ios script directory as the build root so paths resolve to ios/build
+UNI_BUILD_ROOT="$SCRIPT_DIR"
 UNI_TMP="$UNI_BUILD_ROOT/tmp"
 UNI_TMP_LLVM_VER_FILE="$UNI_TMP/llvm.ver.txt"
 FF_TARGET=$1
@@ -54,8 +53,12 @@ do_lipo_ffmpeg() {
         fi
     done
 
-    xcrun lipo -create $LIPO_FLAGS -output $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
-    xcrun lipo -info $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
+    if [ "$LIPO_FLAGS" != "" ]; then
+        xcrun lipo -create $LIPO_FLAGS -output $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
+        xcrun lipo -info $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
+    else
+        echo "no input files for lipo $LIB_FILE, skipping"
+    fi
 }
 
 SSL_LIBS="libcrypto libssl"
@@ -97,28 +100,31 @@ do_lipo_all() {
 
             mkdir -p "$UNI_INC_DIR/libavutil/$ARCH"
             cp -f "$ARCH_INC_DIR/libavutil/avconfig.h" "$UNI_INC_DIR/libavutil/$ARCH/avconfig.h"
-            cp -f tools/avconfig.h "$UNI_INC_DIR/libavutil/avconfig.h"
+            cp -f "$SCRIPT_DIR/tools/avconfig.h" "$UNI_INC_DIR/libavutil/avconfig.h"
             cp -f "$ARCH_INC_DIR/libavutil/ffversion.h" "$UNI_INC_DIR/libavutil/$ARCH/ffversion.h"
-            cp -f tools/ffversion.h "$UNI_INC_DIR/libavutil/ffversion.h"
+            cp -f "$SCRIPT_DIR/tools/ffversion.h" "$UNI_INC_DIR/libavutil/ffversion.h"
             mkdir -p "$UNI_INC_DIR/libffmpeg/$ARCH"
             cp -f "$ARCH_INC_DIR/libffmpeg/config.h" "$UNI_INC_DIR/libffmpeg/$ARCH/config.h"
-            cp -f tools/config.h "$UNI_INC_DIR/libffmpeg/config.h"
+            cp -f "$SCRIPT_DIR/tools/config.h" "$UNI_INC_DIR/libffmpeg/config.h"
         fi
     done
 
     for SSL_LIB in $SSL_LIBS; do
         do_lipo_ssl "$SSL_LIB.a"
     done
+
+    # XCFramework packaging disabled in this configuration; we produce
+    # universal (fat) libraries under build/universal/lib via lipo above.
 }
 
 #----------
 if [ "$FF_TARGET" = "arm64" ]; then
     echo_archs
-    sh tools/do-compile-ffmpeg.sh $FF_TARGET $FF_TARGET_EXTRA
+    (cd "$SCRIPT_DIR" && sh tools/do-compile-ffmpeg.sh $FF_TARGET $FF_TARGET_EXTRA)
     do_lipo_all
 elif [ "$FF_TARGET" = "x86_64" ]; then
     echo_archs
-    sh tools/do-compile-ffmpeg.sh $FF_TARGET $FF_TARGET_EXTRA
+    (cd "$SCRIPT_DIR" && sh tools/do-compile-ffmpeg.sh $FF_TARGET $FF_TARGET_EXTRA)
     do_lipo_all
 elif [ "$FF_TARGET" = "lipo" ]; then
     echo_archs
@@ -126,7 +132,7 @@ elif [ "$FF_TARGET" = "lipo" ]; then
 elif [ "$FF_TARGET" = "all" ]; then
     echo_archs
     for ARCH in $FF_ALL_ARCHS; do
-        sh tools/do-compile-ffmpeg.sh $ARCH $FF_TARGET_EXTRA
+        (cd "$SCRIPT_DIR" && sh tools/do-compile-ffmpeg.sh $ARCH $FF_TARGET_EXTRA)
     done
 
     do_lipo_all

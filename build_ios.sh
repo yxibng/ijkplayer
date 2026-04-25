@@ -4,8 +4,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)";
 
 cd $SCRIPT_DIR
 
-git checkout $SCRIPT_DIR
-git clean -dff
+# Note: avoid force-checkout/clean that discards local modifications
+# git checkout $SCRIPT_DIR
+# git clean -dff
 
 
 sh init-ios.sh

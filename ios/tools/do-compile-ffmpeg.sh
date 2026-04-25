@@ -52,6 +52,9 @@ source $FF_BUILD_ROOT/../config/module.sh
 FFMPEG_CFG_FLAGS=
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS $COMMON_FF_CFG_FLAGS"
 
+# normalize arch passed to ffmpeg configure / clang
+FF_CFG_ARCH="$FF_ARCH"
+
 # Optimization options (experts only):
 # FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --disable-armv5te"
 # FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --disable-armv6"
@@ -66,7 +69,7 @@ FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --enable-cross-compile"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --disable-stripping"
 
 ##
-FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --arch=$FF_ARCH"
+FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --arch=$FF_CFG_ARCH"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --target-os=$FF_TAGET_OS"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --enable-static"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --disable-shared"
@@ -130,6 +133,16 @@ elif [ "$FF_ARCH" = "arm64" ]; then
     FF_XCRUN_OSVERSION="-miphoneos-version-min=15.0"
     FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS $FFMPEG_CFG_FLAGS_ARM"
     FF_GASPP_EXPORT="GASPP_FIX_XCODE5=1"
+elif [ "$FF_ARCH" = "arm64-sim" ]; then
+    # arm64 simulator slice — treat as simulator build but arch=arm64
+    FF_BUILD_NAME="ffmpeg-arm64-sim"
+    FF_BUILD_NAME_OPENSSL=openssl-arm64-sim
+    FF_XCRUN_PLATFORM="iPhoneSimulator"
+    FF_XCRUN_OSVERSION="-mios-simulator-version-min=15.0"
+    # normalize arch for configure/clang
+    FF_CFG_ARCH="arm64"
+    # simulator flags
+    FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS $FFMPEG_CFG_FLAGS_SIMULATOR"
 else
     echo "unknown architecture $FF_ARCH"
     exit 1
@@ -144,7 +157,12 @@ echo "===================="
 echo "[*] make ios toolchain $FF_BUILD_NAME"
 echo "===================="
 
-FF_BUILD_SOURCE="$FF_BUILD_ROOT/$FF_BUILD_NAME"
+# For simulator arm64 we reuse the same FFmpeg source tree as arm64
+if [ "$FF_ARCH" = "arm64-sim" ]; then
+    FF_BUILD_SOURCE="$FF_BUILD_ROOT/ffmpeg-arm64"
+else
+    FF_BUILD_SOURCE="$FF_BUILD_ROOT/$FF_BUILD_NAME"
+fi
 FF_BUILD_PREFIX="$FF_BUILD_ROOT/build/$FF_BUILD_NAME/output"
 
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS --prefix=$FF_BUILD_PREFIX"
@@ -164,7 +182,7 @@ FF_XCRUN_CC="xcrun -sdk $FF_XCRUN_SDK clang"
 FFMPEG_CFG_FLAGS="$FFMPEG_CFG_FLAGS $FFMPEG_CFG_CPU"
 
 FFMPEG_CFLAGS=
-FFMPEG_CFLAGS="$FFMPEG_CFLAGS -arch $FF_ARCH"
+FFMPEG_CFLAGS="$FFMPEG_CFLAGS -arch $FF_CFG_ARCH"
 FFMPEG_CFLAGS="$FFMPEG_CFLAGS $FF_XCRUN_OSVERSION"
 FFMPEG_CFLAGS="$FFMPEG_CFLAGS $FFMPEG_EXTRA_CFLAGS"
 FFMPEG_LDFLAGS="$FFMPEG_CFLAGS"

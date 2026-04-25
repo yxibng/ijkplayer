@@ -19,14 +19,13 @@
 #----------
 # modify for your build tool
 
-FF_ALL_ARCHS_IOS6_SDK="x86_64"
-FF_ALL_ARCHS_IOS7_SDK="arm64 x86_64"
-FF_ALL_ARCHS_IOS8_SDK="arm64"
-
-FF_ALL_ARCHS=$FF_ALL_ARCHS_IOS8_SDK
+# Default architectures (env-overridable)
+: ${FF_ALL_ARCHS:="arm64 x86_64"}
 
 #----------
-UNI_BUILD_ROOT=`pwd`
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+# Use the ios script directory as the build root so paths resolve to ios/build
+UNI_BUILD_ROOT="$SCRIPT_DIR"
 UNI_TMP="$UNI_BUILD_ROOT/tmp"
 UNI_TMP_LLVM_VER_FILE="$UNI_TMP/llvm.ver.txt"
 FF_TARGET=$1
@@ -69,10 +68,10 @@ do_lipo_all () {
 #----------
 if [ "$FF_TARGET" = "arm64" ]; then
     echo_archs
-    sh tools/do-compile-openssl.sh $FF_TARGET
+    sh "$SCRIPT_DIR/tools/do-compile-openssl.sh" $FF_TARGET
 elif [ "$FF_TARGET" = "x86_64" ]; then
     echo_archs
-    sh tools/do-compile-openssl.sh $FF_TARGET
+    sh "$SCRIPT_DIR/tools/do-compile-openssl.sh" $FF_TARGET
 elif [ "$FF_TARGET" = "lipo" ]; then
     echo_archs
     do_lipo_all
@@ -80,7 +79,7 @@ elif [ "$FF_TARGET" = "all" ]; then
     echo_archs
     for ARCH in $FF_ALL_ARCHS
     do
-        sh tools/do-compile-openssl.sh $ARCH
+        sh "$SCRIPT_DIR/tools/do-compile-openssl.sh" $ARCH
     done
 
     do_lipo_all
