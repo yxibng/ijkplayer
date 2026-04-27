@@ -4,10 +4,6 @@ SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)";
 
 cd $SCRIPT_DIR
 
-git checkout $SCRIPT_DIR
-git clean -dff
-
-
 sh init-ios.sh
 # sh init-ios-openssl.sh
 
