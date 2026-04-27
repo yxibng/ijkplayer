@@ -27,8 +27,12 @@
 		861DDE3D2BC6326F000F962F /* IJKDemoHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 861DDE3A2BC6326F000F962F /* IJKDemoHistory.m */; };
 		86C225132BC63B1B00C84A3F /* IJKMediaFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C2250E2BC63AFF00C84A3F /* IJKMediaFramework.framework */; };
 		86C225142BC63B1B00C84A3F /* IJKMediaFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 86C2250E2BC63AFF00C84A3F /* IJKMediaFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		86C225172BC63B3700C84A3F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C225152BC63B3300C84A3F /* libcrypto.a */; };
-		86C225182BC63B3700C84A3F /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C225162BC63B3300C84A3F /* libssl.a */; };
+		86D201112BC7000100C84A3F /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D201212BC7000100C84A3F /* libavcodec.a */; };
+		86D201122BC7000100C84A3F /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D201222BC7000100C84A3F /* libavfilter.a */; };
+		86D201132BC7000100C84A3F /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D201232BC7000100C84A3F /* libavformat.a */; };
+		86D201142BC7000100C84A3F /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D201242BC7000100C84A3F /* libavutil.a */; };
+		86D201152BC7000100C84A3F /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D201252BC7000100C84A3F /* libswresample.a */; };
+		86D201162BC7000100C84A3F /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D201262BC7000100C84A3F /* libswscale.a */; };
 		86C2251B2BC63BA900C84A3F /* IJKAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C2251A2BC63BA800C84A3F /* IJKAppDelegate.m */; };
 		86C2251D2BC63BCC00C84A3F /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C2251C2BC63BC400C84A3F /* libz.tbd */; };
 		86C225202BC63C2D00C84A3F /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C2251F2BC63C2500C84A3F /* libc++.tbd */; };
@@ -104,8 +108,12 @@
 		861DDE3A2BC6326F000F962F /* IJKDemoHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IJKDemoHistory.m; sourceTree = "<group>"; };
 		861DDE3B2BC6326F000F962F /* Barcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Barcode.h; sourceTree = "<group>"; };
 		86C225072BC63AFF00C84A3F /* IJKMediaPlayer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = IJKMediaPlayer.xcodeproj; path = ../IJKMediaPlayer/IJKMediaPlayer.xcodeproj; sourceTree = "<group>"; };
-		86C225152BC63B3300C84A3F /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../build/universal/lib/libcrypto.a; sourceTree = "<group>"; };
-		86C225162BC63B3300C84A3F /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ../build/universal/lib/libssl.a; sourceTree = "<group>"; };
+		86D201212BC7000100C84A3F /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = ../build/universal/lib/libavcodec.a; sourceTree = "<group>"; };
+		86D201222BC7000100C84A3F /* libavfilter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavfilter.a; path = ../build/universal/lib/libavfilter.a; sourceTree = "<group>"; };
+		86D201232BC7000100C84A3F /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = ../build/universal/lib/libavformat.a; sourceTree = "<group>"; };
+		86D201242BC7000100C84A3F /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = ../build/universal/lib/libavutil.a; sourceTree = "<group>"; };
+		86D201252BC7000100C84A3F /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswresample.a; path = ../build/universal/lib/libswresample.a; sourceTree = "<group>"; };
+		86D201262BC7000100C84A3F /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswscale.a; path = ../build/universal/lib/libswscale.a; sourceTree = "<group>"; };
 		86C225192BC63BA800C84A3F /* IJKAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IJKAppDelegate.h; sourceTree = SOURCE_ROOT; };
 		86C2251A2BC63BA800C84A3F /* IJKAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IJKAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		86C2251C2BC63BC400C84A3F /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -118,11 +126,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86C225172BC63B3700C84A3F /* libcrypto.a in Frameworks */,
 				86C225202BC63C2D00C84A3F /* libc++.tbd in Frameworks */,
 				86C2251D2BC63BCC00C84A3F /* libz.tbd in Frameworks */,
 				86C225132BC63B1B00C84A3F /* IJKMediaFramework.framework in Frameworks */,
-				86C225182BC63B3700C84A3F /* libssl.a in Frameworks */,
+				86D201122BC7000100C84A3F /* libavfilter.a in Frameworks */,
+				86D201132BC7000100C84A3F /* libavformat.a in Frameworks */,
+				86D201112BC7000100C84A3F /* libavcodec.a in Frameworks */,
+				86D201152BC7000100C84A3F /* libswresample.a in Frameworks */,
+				86D201162BC7000100C84A3F /* libswscale.a in Frameworks */,
+				86D201142BC7000100C84A3F /* libavutil.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,8 +227,12 @@
 				86C2251F2BC63C2500C84A3F /* libc++.tbd */,
 				86C2251E2BC63C1E00C84A3F /* libc++.1.tbd */,
 				86C2251C2BC63BC400C84A3F /* libz.tbd */,
-				86C225152BC63B3300C84A3F /* libcrypto.a */,
-				86C225162BC63B3300C84A3F /* libssl.a */,
+				86D201212BC7000100C84A3F /* libavcodec.a */,
+				86D201222BC7000100C84A3F /* libavfilter.a */,
+				86D201232BC7000100C84A3F /* libavformat.a */,
+				86D201242BC7000100C84A3F /* libavutil.a */,
+				86D201252BC7000100C84A3F /* libswresample.a */,
+				86D201262BC7000100C84A3F /* libswscale.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -504,13 +520,17 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../build/universal/lib";
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl,-ld_classic",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.axzt.IJKMediaDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -533,13 +553,17 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../build/universal/lib";
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl,-ld_classic",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.axzt.IJKMediaDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
