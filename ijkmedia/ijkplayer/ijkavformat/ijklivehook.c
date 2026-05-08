@@ -21,13 +21,16 @@
 
 #include "libavformat/avformat.h"
 #include "libavformat/url.h"
+#include "libavformat/version.h"
 #include "libavutil/avstring.h"
 #include "libavutil/opt.h"
 
 #include "ijkplayer/ijkavutil/opt.h"
 
 #include "ijkavformat.h"
-#include "libavutil/application.h"
+#include "../ijkavutil/application.h"
+
+#include "ijkplayer/ijkavutil/avdict_compat.h"
 
 typedef struct {
     AVClass         *class;
@@ -192,7 +195,7 @@ static int ijklivehook_read_header(AVFormatContext *avf, AVDictionary **options)
     int         ret         = -1;
 
     c->app_ctx = (AVApplicationContext *)av_dict_strtoptr(c->app_ctx_intptr);
-    av_strstart(avf->filename, "ijklivehook:", &inner_url);
+    av_strstart(avf->url, "ijklivehook:", &inner_url);
 
     c->io_control.size = sizeof(c->io_control);
     strlcpy(c->io_control.url, inner_url, sizeof(c->io_control.url));
@@ -306,6 +309,7 @@ static const AVClass ijklivehook_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
+#if LIBAVFORMAT_VERSION_MAJOR < 60
 AVInputFormat ijkff_ijklivehook_demuxer = {
     .name           = "ijklivehook",
     .long_name      = "Live Hook Controller",
@@ -317,3 +321,11 @@ AVInputFormat ijkff_ijklivehook_demuxer = {
     .read_close     = ijklivehook_read_close,
     .priv_class     = &ijklivehook_class,
 };
+#else
+AVInputFormat ijkff_ijklivehook_demuxer = {
+    .name       = "ijklivehook",
+    .long_name  = "Live Hook Controller",
+    .flags      = AVFMT_NOFILE | AVFMT_TS_DISCONT,
+    .priv_class = &ijklivehook_class,
+};
+#endif

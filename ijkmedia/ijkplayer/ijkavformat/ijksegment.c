@@ -20,13 +20,16 @@
  */
 
 #include <assert.h>
+#include <inttypes.h>
+#include <stdlib.h>
+
 #include "libavformat/avformat.h"
 #include "libavformat/url.h"
 #include "libavutil/avstring.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 
-#include "libavutil/application.h"
+#include "../ijkavutil/application.h"
 
 typedef struct Context {
     AVClass        *class;
@@ -34,14 +37,30 @@ typedef struct Context {
 
     /* options */
     char           *http_hook;
-    char *         app_ctx_intptr;
+    char           *app_ctx_intptr;
 } Context;
+
+static void ijkdict_set_app_ctx(AVDictionary **dict, const char *key, AVApplicationContext *app_ctx)
+{
+    char app_ctx_buf[32];
+
+    snprintf(app_ctx_buf, sizeof(app_ctx_buf), "%" PRIuPTR, (uintptr_t)app_ctx);
+    av_dict_set(dict, key, app_ctx_buf, 0);
+}
+
+static AVApplicationContext *ijkdict_get_app_ctx(const char *app_ctx_intptr)
+{
+    if (!app_ctx_intptr || !*app_ctx_intptr)
+        return NULL;
+
+    return (AVApplicationContext *)(uintptr_t)strtoull(app_ctx_intptr, NULL, 10);
+}
 
 static int ijksegment_open(URLContext *h, const char *arg, int flags, AVDictionary **options)
 {
     Context *c = h->priv_data;
     AVAppIOControl io_control = {0};
-    AVApplicationContext *app_ctx = (AVApplicationContext *)av_dict_strtoptr(c->app_ctx_intptr);
+    AVApplicationContext *app_ctx = ijkdict_get_app_ctx(c->app_ctx_intptr);
     int ret = -1;
     int segment_index = -1;
 
@@ -65,7 +84,7 @@ static int ijksegment_open(URLContext *h, const char *arg, int flags, AVDictiona
         goto fail;
     }
 
-    av_dict_set_intptr(options, "ijkapplication", (uintptr_t )app_ctx, 0);
+    ijkdict_set_app_ctx(options, "ijkapplication", app_ctx);
     av_dict_set_int(options, "ijkinject-segment-index", segment_index, 0);
 
     ret = ffurl_open_whitelist(&c->inner,
@@ -109,7 +128,7 @@ static int64_t ijksegment_seek(URLContext *h, int64_t pos, int whence)
 #define D AV_OPT_FLAG_DECODING_PARAM
 
 static const AVOption options[] = {
-    { "ijkapplication", "AVApplicationContext", OFFSET(app_ctx_intptr), AV_OPT_TYPE_INT64, { .i64 = 0 }, INT64_MIN, INT64_MAX, .flags = D },
+    { "ijkapplication", "AVApplicationContext", OFFSET(app_ctx_intptr), AV_OPT_TYPE_STRING, { .str = NULL }, 0, 0, .flags = D },
     { NULL }
 };
 

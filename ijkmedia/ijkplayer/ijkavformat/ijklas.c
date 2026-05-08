@@ -21,9 +21,12 @@
 #include "libavutil/time.h"
 #include "libavformat/avformat.h"
 #include "libavformat/url.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/bsf.h"
 #include "libavformat/avio_internal.h"
 #include "libavformat/id3v2.h"
 #include "libavformat/flv.h"
+#include "libavformat/version.h"
 
 #include "ijksdl/ijksdl_thread.h"
 #include "ijksdl/ijksdl_mutex.h"
@@ -2061,6 +2064,7 @@ static const AVClass ijklas_class = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
+#if LIBAVFORMAT_VERSION_MAJOR < 60
 AVInputFormat ijkff_ijklas_demuxer = {
     .name           = "ijklas",
     .long_name      = "Live Adaptive Streaming",
@@ -2074,5 +2078,14 @@ AVInputFormat ijkff_ijklas_demuxer = {
     .extensions     = "las",
     .flags          = AVFMT_NOFILE
 };
+#else
+AVInputFormat ijkff_ijklas_demuxer = {
+    .name       = "ijklas",
+    .long_name  = "Live Adaptive Streaming",
+    .priv_class = &ijklas_class,
+    .extensions = "las",
+    .flags      = AVFMT_NOFILE
+};
+#endif
 
 

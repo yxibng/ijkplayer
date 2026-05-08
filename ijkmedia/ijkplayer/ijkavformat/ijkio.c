@@ -27,6 +27,7 @@
 #include "libavutil/opt.h"
 
 #include "ijkiomanager.h"
+#include "ijkplayer/ijkavutil/avdict_compat.h"
 #include "ijkplayer/ijkavutil/ijkdict.h"
 
 typedef struct Context {

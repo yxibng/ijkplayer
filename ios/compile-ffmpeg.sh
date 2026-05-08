@@ -44,36 +44,49 @@ echo_archs() {
 FF_LIBS="libavcodec libavfilter libavformat libavutil libswscale libswresample"
 do_lipo_ffmpeg() {
     LIB_FILE=$1
-    LIPO_FLAGS=
+    LIPO_INPUTS=()
     for ARCH in $FF_ALL_ARCHS; do
         ARCH_LIB_FILE="$UNI_BUILD_ROOT/build/ffmpeg-$ARCH/output/lib/$LIB_FILE"
         if [ -f "$ARCH_LIB_FILE" ]; then
-            LIPO_FLAGS="$LIPO_FLAGS $ARCH_LIB_FILE"
+            LIPO_INPUTS+=("$ARCH_LIB_FILE")
         else
             echo "skip $LIB_FILE of $ARCH"
         fi
     done
 
-    xcrun lipo -create $LIPO_FLAGS -output $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
-    xcrun lipo -info $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
+    OUTPUT_LIB_FILE="$UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE"
+    if [ ${#LIPO_INPUTS[@]} -eq 0 ]; then
+        echo "skip $LIB_FILE, no arch input found"
+        return
+    elif [ ${#LIPO_INPUTS[@]} -eq 1 ]; then
+        # Keep thin archive as-is to preserve member alignment for modern linkers.
+        cp -f "${LIPO_INPUTS[0]}" "$OUTPUT_LIB_FILE"
+    else
+        xcrun lipo -create "${LIPO_INPUTS[@]}" -output "$OUTPUT_LIB_FILE"
+    fi
+
+    xcrun lipo -info $OUTPUT_LIB_FILE
 }
 
 SSL_LIBS="libcrypto libssl"
 do_lipo_ssl() {
     LIB_FILE=$1
-    LIPO_FLAGS=
+    LIPO_INPUTS=()
     for ARCH in $FF_ALL_ARCHS; do
         ARCH_LIB_FILE="$UNI_BUILD_ROOT/build/openssl-$ARCH/output/lib/$LIB_FILE"
         if [ -f "$ARCH_LIB_FILE" ]; then
-            LIPO_FLAGS="$LIPO_FLAGS $ARCH_LIB_FILE"
+            LIPO_INPUTS+=("$ARCH_LIB_FILE")
         else
             echo "skip $LIB_FILE of $ARCH"
         fi
     done
 
-    if [ "$LIPO_FLAGS" != "" ]; then
-        xcrun lipo -create $LIPO_FLAGS -output $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
-        xcrun lipo -info $UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE
+    if [ ${#LIPO_INPUTS[@]} -eq 1 ]; then
+        cp -f "${LIPO_INPUTS[0]}" "$UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE"
+        xcrun lipo -info "$UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE"
+    elif [ ${#LIPO_INPUTS[@]} -gt 1 ]; then
+        xcrun lipo -create "${LIPO_INPUTS[@]}" -output "$UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE"
+        xcrun lipo -info "$UNI_BUILD_ROOT/build/universal/lib/$LIB_FILE"
     fi
 }
 

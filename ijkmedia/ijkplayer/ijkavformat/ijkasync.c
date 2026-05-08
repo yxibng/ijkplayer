@@ -33,13 +33,16 @@
 #include "libavutil/error.h"
 #include "libavutil/fifo.h"
 #include "libavutil/log.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/thread.h"
 #include "libavutil/time.h"
 #include "libavformat/url.h"
 #include <stdint.h>
 
-#include "libavutil/application.h"
+#include "../ijkavutil/application.h"
+
+#include "ijkplayer/ijkavutil/avdict_compat.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -49,7 +52,7 @@
 
 typedef struct RingBuffer
 {
-    AVFifoBuffer *fifo;
+    AVFifo       *fifo;
     int           read_back_capacity;
 
     int           read_pos;
@@ -91,7 +94,7 @@ typedef struct Context {
 static int ring_init(RingBuffer *ring, int64_t capacity, int64_t read_back_capacity)
 {
     memset(ring, 0, sizeof(RingBuffer));
-    ring->fifo = av_fifo_alloc((unsigned int)(capacity + read_back_capacity));
+    ring->fifo = av_fifo_alloc2((size_t)(capacity + read_back_capacity), 1, 0);
     if (!ring->fifo)
         return AVERROR(ENOMEM);
 
@@ -101,45 +104,82 @@ static int ring_init(RingBuffer *ring, int64_t capacity, int64_t read_back_capac
 
 static void ring_destroy(RingBuffer *ring)
 {
-    av_fifo_freep(&ring->fifo);
+    av_fifo_freep2(&ring->fifo);
 }
 
 static void ring_reset(RingBuffer *ring)
 {
-    av_fifo_reset(ring->fifo);
+    av_fifo_reset2(ring->fifo);
     ring->read_pos = 0;
 }
 
 static int ring_size(RingBuffer *ring)
 {
-    return av_fifo_size(ring->fifo) - ring->read_pos;
+    return (int)av_fifo_can_read(ring->fifo) - ring->read_pos;
 }
 
 static int ring_space(RingBuffer *ring)
 {
-    return av_fifo_space(ring->fifo);
+    return (int)av_fifo_can_write(ring->fifo);
 }
 
 static int ring_generic_read(RingBuffer *ring, void *dest, int buf_size, void (*func)(void*, void*, int))
 {
     int ret;
+    uint8_t *tmp = dest;
 
     av_assert2(buf_size <= ring_size(ring));
-    ret = av_fifo_generic_peek_at(ring->fifo, dest, ring->read_pos, buf_size, func);
+    if (func) {
+        tmp = av_malloc((size_t)buf_size);
+        if (!tmp)
+            return AVERROR(ENOMEM);
+    }
+
+    ret = av_fifo_peek(ring->fifo, tmp, (size_t)buf_size, (size_t)ring->read_pos);
+    if (ret < 0) {
+        if (func)
+            av_free(tmp);
+        return ret;
+    }
+
+    if (func) {
+        func(dest, tmp, buf_size);
+        av_free(tmp);
+    }
+
     ring->read_pos += buf_size;
 
     if (ring->read_pos > ring->read_back_capacity) {
-        av_fifo_drain(ring->fifo, ring->read_pos - ring->read_back_capacity);
+        av_fifo_drain2(ring->fifo, (size_t)(ring->read_pos - ring->read_back_capacity));
         ring->read_pos = ring->read_back_capacity;
     }
 
-    return ret;
+    return buf_size;
 }
 
 static int ring_generic_write(RingBuffer *ring, void *src, int size, int (*func)(void*, void*, int))
 {
+    int ret;
+
     av_assert2(size <= ring_space(ring));
-    return av_fifo_generic_write(ring->fifo, src, size, func);
+    if (func) {
+        uint8_t *tmp = av_malloc((size_t)size);
+        if (!tmp)
+            return AVERROR(ENOMEM);
+
+        ret = func(src, tmp, size);
+        if (ret > 0) {
+            int write_ret = av_fifo_write(ring->fifo, tmp, (size_t)ret);
+            if (write_ret < 0)
+                ret = write_ret;
+        }
+
+        av_free(tmp);
+        return ret;
+    }
+
+    ret = av_fifo_write(ring->fifo, src, (size_t)size);
+    return ret < 0 ? ret : size;
 }
 
 static int ring_size_of_read_back(RingBuffer *ring)
@@ -535,7 +575,7 @@ static const AVOption options[] = {
         OFFSET(forwards_capacity),  AV_OPT_TYPE_INT64, {.i64 = 128 * 1024}, 128 * 1024, 128 * 1024 * 1024, D },
     { "async-backwards-capacity",   "max bytes that may be seek backward without seeking in inner protocol",
         OFFSET(backwards_capacity), AV_OPT_TYPE_INT64, {.i64 = 128 * 1024}, 128 * 1024, 128 * 1024 * 1024, D },
-    { "ijkapplication", "AVApplicationContext", OFFSET(app_ctx_intptr), AV_OPT_TYPE_STRING, { .str = 0 }, 0, 0, .flags = D },
+    { "ijkapplication", "AVApplicationContext", OFFSET(app_ctx_intptr), AV_OPT_TYPE_STRING, { .str = NULL }, 0, 0, .flags = D },
     {NULL},
 };
 

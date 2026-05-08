@@ -25,6 +25,7 @@
 #include "ijkplayer/ijkavutil/ijkutils.h"
 #include "ijkplayer/ijkavutil/ijkthreadpool.h"
 #include "ijkplayer/ijkavutil/ijkstl.h"
+#include "libavutil/error.h"
 #include "libavutil/log.h"
 
 #include <stdint.h>

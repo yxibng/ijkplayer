@@ -201,10 +201,22 @@
     // Handle a movied picked from a photo album
     if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)
         == kCFCompareEqualTo) {
+        NSURL *pickedMovieURL = [info objectForKey:UIImagePickerControllerMediaURL];
+        if (pickedMovieURL.isFileURL) {
+            NSString *extension = pickedMovieURL.pathExtension.length > 0 ? pickedMovieURL.pathExtension : @"mov";
+            NSString *fileName = [NSString stringWithFormat:@"ijkdemo-%@.%@", [[NSUUID UUID] UUIDString], extension];
+            NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+            NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
 
-        NSString *moviePath = [[info objectForKey:
-                                UIImagePickerControllerMediaURL] path];
-        movieUrl = [NSURL URLWithString:moviePath];
+            [[NSFileManager defaultManager] removeItemAtURL:targetURL error:nil];
+            if ([[NSFileManager defaultManager] copyItemAtURL:pickedMovieURL toURL:targetURL error:nil]) {
+                movieUrl = targetURL;
+            } else {
+                movieUrl = pickedMovieURL;
+            }
+        } else {
+            movieUrl = pickedMovieURL;
+        }
     }
 
     [self dismissViewControllerAnimated:YES completion:^(void){

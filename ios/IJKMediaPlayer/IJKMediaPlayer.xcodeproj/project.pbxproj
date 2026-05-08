@@ -1442,6 +1442,7 @@
 					../build/universal/include,
 					IJKMediaPlayer/ijkmedia,
 					../../ijkmedia,
+					../ffmpeg-arm64,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/IJKMediaFrameworkWithSSL.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1493,6 +1494,7 @@
 					../build/universal/include,
 					IJKMediaPlayer/ijkmedia,
 					../../ijkmedia,
+					../ffmpeg-arm64,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/IJKMediaFrameworkWithSSL.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1547,6 +1549,7 @@
 					../build/universal/include,
 					IJKMediaPlayer/ijkmedia,
 					../../ijkmedia,
+					../ffmpeg-arm64,
 				);
 				INFOPLIST_FILE = IJKMediaFramework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1593,6 +1596,7 @@
 					../build/universal/include,
 					IJKMediaPlayer/ijkmedia,
 					../../ijkmedia,
+					../ffmpeg-arm64,
 				);
 				INFOPLIST_FILE = IJKMediaFramework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

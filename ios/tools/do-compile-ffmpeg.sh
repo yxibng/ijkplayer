@@ -225,10 +225,17 @@ cd $FF_BUILD_SOURCE
 if [ -f "./config.h" ]; then
     echo 'reuse configure'
 else
+    # Use xcrun ar/ranlib/nm to avoid GNU binutils misaligning archive members
+    FF_XCRUN_AR="$(xcrun --find ar)"
+    FF_XCRUN_RANLIB="$(xcrun --find ranlib)"
+    FF_XCRUN_NM="$(xcrun --find nm)"
     echo "config: $FFMPEG_CFG_FLAGS $FF_XCRUN_CC"
     ./configure \
         $FFMPEG_CFG_FLAGS \
         --cc="$FF_XCRUN_CC" \
+        --ar="$FF_XCRUN_AR" \
+        --ranlib="$FF_XCRUN_RANLIB" \
+        --nm="$FF_XCRUN_NM" \
         $FFMPEG_CFG_CPU \
         --extra-cflags="$FFMPEG_CFLAGS" \
         --extra-cxxflags="$FFMPEG_CFLAGS" \

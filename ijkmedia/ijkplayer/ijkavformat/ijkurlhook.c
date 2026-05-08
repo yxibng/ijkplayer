@@ -20,13 +20,16 @@
  */
 
 #include <assert.h>
+#include <inttypes.h>
+#include <stdlib.h>
+
 #include "libavformat/avformat.h"
 #include "libavformat/url.h"
 #include "libavutil/avstring.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
 
-#include "libavutil/application.h"
+#include "../ijkavutil/application.h"
 
 typedef struct Context {
     AVClass        *class;
@@ -46,9 +49,25 @@ typedef struct Context {
     int             segment_index;
     int64_t         test_fail_point;
     int64_t         test_fail_point_next;
-    char*         app_ctx_intptr;
+    char           *app_ctx_intptr;
     AVApplicationContext *app_ctx;
 } Context;
+
+static void ijkdict_set_app_ctx(AVDictionary **dict, const char *key, AVApplicationContext *app_ctx)
+{
+    char app_ctx_buf[32];
+
+    snprintf(app_ctx_buf, sizeof(app_ctx_buf), "%" PRIuPTR, (uintptr_t)app_ctx);
+    av_dict_set(dict, key, app_ctx_buf, 0);
+}
+
+static AVApplicationContext *ijkdict_get_app_ctx(const char *app_ctx_intptr)
+{
+    if (!app_ctx_intptr || !*app_ctx_intptr)
+        return NULL;
+
+    return (AVApplicationContext *)(uintptr_t)strtoull(app_ctx_intptr, NULL, 10);
+}
 
 static int ijkurlhook_call_inject(URLContext *h)
 {
@@ -141,7 +160,7 @@ static int ijkurlhook_init(URLContext *h, const char *arg, int flags, AVDictiona
     if (options)
         av_dict_copy(&c->inner_options, *options, 0);
 
-    av_dict_set_intptr(&c->inner_options, "ijkapplication", (uintptr_t )c->app_ctx, 0);
+    ijkdict_set_app_ctx(&c->inner_options, "ijkapplication", c->app_ctx);
     av_dict_set_int(&c->inner_options, "ijkinject-segment-index", c->segment_index, 0);
 
     c->app_io_ctrl.size = sizeof(c->app_io_ctrl);
@@ -162,7 +181,7 @@ static int ijktcphook_open(URLContext *h, const char *arg, int flags, AVDictiona
     Context *c = h->priv_data;
     int ret = 0;
 
-    c->app_ctx = (AVApplicationContext *)av_dict_strtoptr(c->app_ctx_intptr);
+    c->app_ctx = ijkdict_get_app_ctx(c->app_ctx_intptr);
     c->scheme = "ijktcphook:";
     c->inner_scheme = "tcp:";
     ret = ijkurlhook_init(h, arg, flags, options);
@@ -251,7 +270,7 @@ static int ijkhttphook_open(URLContext *h, const char *arg, int flags, AVDiction
     Context *c = h->priv_data;
     int ret = 0;
 
-    c->app_ctx = (AVApplicationContext *)av_dict_strtoptr(c->app_ctx_intptr);
+    c->app_ctx = ijkdict_get_app_ctx(c->app_ctx_intptr);
     c->scheme = "ijkhttphook:";
     if (av_stristart(arg, "ijkhttphook:https:", NULL))
         c->inner_scheme = "https:";

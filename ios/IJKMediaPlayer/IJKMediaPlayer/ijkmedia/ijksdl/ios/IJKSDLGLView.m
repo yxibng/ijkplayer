@@ -82,6 +82,7 @@ typedef NS_ENUM(NSInteger, IJKSDLGLViewApplicationState) {
         _shouldLockWhileBeingMovedToWindow = YES;
         self.glActiveLock = [[NSRecursiveLock alloc] init];
         _registeredNotifications = [[NSMutableArray alloc] init];
+        _applicationState = IJKSDLGLViewApplicationForegroundState;
         [self registerApplicationObservers];
 
         _didSetupGL = NO;
@@ -202,17 +203,8 @@ typedef NS_ENUM(NSInteger, IJKSDLGLViewApplicationState) {
             return YES;
         case IJKSDLGLViewApplicationBackgroundState:
             return NO;
-        default: {
-            UIApplicationState appState = [UIApplication sharedApplication].applicationState;
-            switch (appState) {
-                case UIApplicationStateActive:
-                    return YES;
-                case UIApplicationStateInactive:
-                case UIApplicationStateBackground:
-                default:
-                    return NO;
-            }
-        }
+        default:
+            return YES;
     }
 }
 
